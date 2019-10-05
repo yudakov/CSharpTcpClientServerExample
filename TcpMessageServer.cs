@@ -31,7 +31,6 @@ namespace TcpClientServer
         /// Начать прослушивание входящих сообщений
         /// на локальном {Address}:{Port}
         /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
         public void Start()
         {
             if (Port == 0)
@@ -112,7 +111,11 @@ namespace TcpClientServer
                                 Trace.WriteLine(ex);
                             }
                             
-                            buffer.SetLength(0);
+                            var remainder = buffer.Length - (4 + length);
+                            if (remainder > 0)
+                                Array.Copy(buffer.GetBuffer(), 4 + length, buffer.GetBuffer(), 0, remainder);
+
+                            buffer.SetLength(remainder);
                         }
                     }
 
