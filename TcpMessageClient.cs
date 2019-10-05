@@ -52,8 +52,17 @@ namespace TcpClientServer
 
                 var body = Encoding.UTF8.GetBytes(text);
                 var header = BitConverter.GetBytes(body.Length);
-                Output.GetStream().Write(header, 0, header.Length);
-                Output.GetStream().Write(body, 0, body.Length);
+                try
+                {
+                    Output.GetStream().Write(header, 0, header.Length);
+                    Output.GetStream().Write(body, 0, body.Length);
+                }
+                catch (IOException)
+                {
+                    Output.Dispose();
+                    Output = null;
+                    throw;
+                }
             }
             finally
             {
