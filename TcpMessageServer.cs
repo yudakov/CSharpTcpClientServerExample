@@ -35,10 +35,10 @@ namespace TcpClientServer
         public void Start()
         {
             if (Port == 0)
-                throw new InvalidOperationException("LocalPort is empty");
+                throw new InvalidOperationException("Port is empty");
 
             if (String.IsNullOrEmpty(Address))
-                throw new InvalidOperationException("LocalAddress is empty");
+                throw new InvalidOperationException("Address is empty");
 
             try
             {
