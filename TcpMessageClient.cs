@@ -55,11 +55,6 @@ namespace TcpClientServer
                 Output.GetStream().Write(header, 0, header.Length);
                 Output.GetStream().Write(body, 0, body.Length);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                Trace.WriteLine(ex.ToString());
-            }
             finally
             {
                 OutputLock.Release();
