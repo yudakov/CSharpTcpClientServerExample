@@ -39,10 +39,10 @@ namespace TcpClientServer
                 if (Output == null)
                 {
                     if (Port == 0)
-                        throw new InvalidOperationException("RemotePort is empty");
+                        throw new InvalidOperationException("Port is empty");
 
                     if (String.IsNullOrEmpty(Host))
-                        throw new InvalidOperationException("RemoteHost is empty");
+                        throw new InvalidOperationException("Host is empty");
 
                     Output = new TcpClient(Host, Port);
                 }
