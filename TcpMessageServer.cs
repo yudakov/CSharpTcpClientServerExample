@@ -66,34 +66,20 @@ namespace TcpClientServer
             var chunk = new byte[10000];
             using (var buffer = new MemoryStream())
             {
-                async Task<bool> ProcessStep()
+                while (true)
                 {
-                    NetworkStream stream;
-                    try
-                    {
-                        stream = client.GetStream();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        return false;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        return false;
-                    }
-
                     int count;
                     try
                     {
-                        count = await stream.ReadAsync(chunk, 0, chunk.Length);
+                        count = await client.GetStream().ReadAsync(chunk, 0, chunk.Length);
                     }
-                    catch (ObjectDisposedException)
+                    catch (InvalidOperationException)
                     {
-                        return false; // Connection closed
+                        break; // Connection closed
                     }
 
                     if (count == 0)
-                        return false; // Connection closed
+                        break; // Connection closed
 
                     buffer.Write(chunk, 0, count);
                     if (buffer.Length > 4) // 4 bytes header (body length) + message body
@@ -110,7 +96,7 @@ namespace TcpClientServer
                             {
                                 Trace.WriteLine(ex);
                             }
-                            
+
                             var remainder = buffer.Length - (4 + length);
                             if (remainder > 0)
                                 Array.Copy(buffer.GetBuffer(), 4 + length, buffer.GetBuffer(), 0, remainder);
@@ -118,12 +104,6 @@ namespace TcpClientServer
                             buffer.SetLength(remainder);
                         }
                     }
-
-                    return true;
-                }
-
-                while (await ProcessStep())
-                {
                 }
             }
         }
