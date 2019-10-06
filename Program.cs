@@ -27,10 +27,7 @@ namespace TcpClientServer
 
             try
             {
-                if (!arguments.TryGetValue("-remote", out var value))
-                    throw new ArgumentNullException("-remote");
-
-                var pair = value.Split(':');
+                var pair = arguments["-remote"].Split(':');
                 if (pair.Length != 2)
                     throw new ArgumentOutOfRangeException("Invalid remote address:port");
 
@@ -42,10 +39,7 @@ namespace TcpClientServer
                 {
                     WriteLine($"Using remote party at {client.Host}:{client.Port}");
                     
-                    if (!arguments.TryGetValue("-local", out value))
-                        throw new ArgumentNullException("-local");
-
-                    pair = value.Split(':');
+                    pair = arguments["-local"].Split(':');
                     if (pair.Length != 2)
                         throw new ArgumentOutOfRangeException("Invalid local address:port");
 
