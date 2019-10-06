@@ -46,9 +46,9 @@ namespace TcpClientServer
             if (String.IsNullOrEmpty(Address))
                 throw new InvalidOperationException("Address is empty");
 
+            Input = new TcpListener(IPAddress.Parse(Address), Port);
             try
             {
-                Input = new TcpListener(IPAddress.Parse(Address), Port);
                 Input.Start();
             }
             catch (Exception)
