@@ -6,7 +6,7 @@ namespace TcpClientServer
 {
     internal static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             WriteLine("TCP text message Client/Server");
 
@@ -57,7 +57,10 @@ namespace TcpClientServer
                     {
                         WriteLine($"Listening at {server.Address}:{server.Port}");
                         
-                        server.MessageReceived += (tcpClient, text) => { WriteLine("< " + text); };
+                        server.MessageReceived += (tcpClient, text) =>
+                        {
+                            WriteLine("< " + text);
+                        };
                         server.Start();
 
                         WriteLine("Write text and press Enter to send message. Send empty message to exit");
@@ -72,7 +75,7 @@ namespace TcpClientServer
 
                             try
                             {
-                                client.SendMessage(line);
+                                await client.SendMessage(line);
                             }
                             catch (Exception ex)
                             {
