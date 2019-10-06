@@ -28,6 +28,13 @@ namespace TcpClientServer
         public int Port { get; set; }
 
         /// <summary>
+        /// Получено новое входящее сообщение:
+        /// TcpClient - от кого сообщение
+        /// string - текст сообщения
+        /// </summary>
+        public event Action<TcpClient, string> MessageReceived;
+
+        /// <summary>
         /// Начать прослушивание входящих сообщений
         /// на локальном {Address}:{Port}
         /// </summary>
@@ -52,13 +59,6 @@ namespace TcpClientServer
 
             AcceptSocket();
         }
-
-        /// <summary>
-        /// Получено новое входящее сообщение:
-        /// TcpClient - от кого сообщение
-        /// string - текст сообщения
-        /// </summary>
-        public event Action<TcpClient, string> MessageReceived;
 
         [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
         async Task ProcessClient(TcpClient client)
