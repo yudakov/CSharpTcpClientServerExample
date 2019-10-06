@@ -31,7 +31,7 @@ namespace TcpClientServer
                 if (pair.Length != 2)
                     throw new ArgumentOutOfRangeException("Invalid remote address:port");
 
-                using (var client = new TcpMessageClient()
+                using (var client = new TcpMessageClient
                 {
                     Host = pair[0],
                     Port = int.Parse(pair[1])
@@ -43,7 +43,7 @@ namespace TcpClientServer
                     if (pair.Length != 2)
                         throw new ArgumentOutOfRangeException("Invalid local address:port");
 
-                    using (var server = new TcpMessageServer()
+                    using (var server = new TcpMessageServer
                     {
                         Address = pair[0],
                         Port = int.Parse(pair[1])
