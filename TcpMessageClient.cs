@@ -28,12 +28,12 @@ namespace TcpClientServer
         /// Отправить текстовое сообщение
         /// </summary>
         /// <param name="text">Текст сообщения</param>
-        public void SendMessage(string text)
+        public async Task SendMessage(string text)
         {
             if (String.IsNullOrEmpty(text))
                 throw new ArgumentNullException(nameof(text));
 
-            OutputLock.Wait();
+            await OutputLock.WaitAsync();
             try
             {
                 if (Output == null)
@@ -48,14 +48,14 @@ namespace TcpClientServer
                 }
 
                 if (!Output.Connected)
-                    Output.Connect(Host, Port);
+                    await Output.ConnectAsync(Host, Port);
 
                 var body = Encoding.UTF8.GetBytes(text);
                 var header = BitConverter.GetBytes(body.Length);
                 try
                 {
-                    Output.GetStream().Write(header, 0, header.Length);
-                    Output.GetStream().Write(body, 0, body.Length);
+                    await Output.GetStream().WriteAsync(header, 0, header.Length);
+                    await Output.GetStream().WriteAsync(body, 0, body.Length);
                 }
                 catch (IOException)
                 {
