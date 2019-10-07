@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -60,7 +59,6 @@ namespace TcpClientServer
             AcceptSocket();
         }
 
-        [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
         async Task ProcessClient(TcpClient client)
         {
             var chunk = new byte[10000];
@@ -77,17 +75,20 @@ namespace TcpClientServer
                     {
                         break; // Connection closed
                     }
-
                     if (count == 0)
                         break; // Connection closed
 
                     buffer.Write(chunk, 0, count);
-                    if (buffer.Length > 4) // 4 bytes header (body length) + message body
+                    
+                    const int headerLength = 4;
+                    if (buffer.Length > headerLength)
                     {
-                        var length = BitConverter.ToInt32(buffer.GetBuffer(), 0);
-                        if (buffer.Length >= 4 + length)
+                        var bodyLength = BitConverter.ToInt32(buffer.GetBuffer(), 0);
+                        var messageLength = headerLength + bodyLength;
+                        
+                        if (buffer.Length >= messageLength)
                         {
-                            var text = Encoding.UTF8.GetString(buffer.GetBuffer(), 4, length);
+                            var text = Encoding.UTF8.GetString(buffer.GetBuffer(), headerLength, bodyLength);
                             try
                             {
                                 MessageReceived?.Invoke(client, text);
@@ -97,9 +98,9 @@ namespace TcpClientServer
                                 Trace.WriteLine(ex);
                             }
 
-                            var remainder = buffer.Length - (4 + length);
+                            var remainder = buffer.Length - messageLength;
                             if (remainder > 0)
-                                Array.Copy(buffer.GetBuffer(), 4 + length, buffer.GetBuffer(), 0, remainder);
+                                Array.Copy(buffer.GetBuffer(), messageLength, buffer.GetBuffer(), 0, remainder);
 
                             buffer.SetLength(remainder);
                         }
