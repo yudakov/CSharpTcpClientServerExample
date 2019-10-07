@@ -33,7 +33,7 @@ namespace TcpClientServer
             if (String.IsNullOrEmpty(text))
                 throw new ArgumentNullException(nameof(text));
 
-            await OutputLock.WaitAsync();
+            await Lock.WaitAsync();
             try
             {
                 if (Output == null)
@@ -66,13 +66,13 @@ namespace TcpClientServer
             }
             finally
             {
-                OutputLock.Release();
+                Lock.Release();
             }
         }
 
         private TcpClient Output;
 
-        private readonly SemaphoreSlim OutputLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim Lock = new SemaphoreSlim(1);
 
         /// <summary>
         /// Очищает используемые ресурсы
@@ -80,7 +80,7 @@ namespace TcpClientServer
         public void Dispose()
         {
             Output?.Dispose();
-            OutputLock.Dispose();
+            Lock.Dispose();
         }
     }
 }
