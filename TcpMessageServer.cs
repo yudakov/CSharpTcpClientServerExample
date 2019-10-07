@@ -56,9 +56,27 @@ namespace TcpClientServer
                 throw;
             }
 
-            AcceptSocket();
+            AcceptNextClient();
         }
 
+        async void AcceptNextClient()
+        {
+            try
+            {
+                var client = await Input.AcceptTcpClientAsync();
+                AcceptNextClient();
+
+                await ProcessClient(client);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+        }
+        
         async Task ProcessClient(TcpClient client)
         {
             var chunk = new byte[10000];
@@ -84,9 +102,7 @@ namespace TcpClientServer
                     if (buffer.Length > headerLength)
                     {
                         var bodyLength = BitConverter.ToInt32(buffer.GetBuffer(), 0);
-                        var messageLength = headerLength + bodyLength;
-                        
-                        if (buffer.Length >= messageLength)
+                        if (buffer.Length >= headerLength + bodyLength)
                         {
                             var text = Encoding.UTF8.GetString(buffer.GetBuffer(), headerLength, bodyLength);
                             try
@@ -98,32 +114,15 @@ namespace TcpClientServer
                                 Trace.WriteLine(ex);
                             }
 
-                            var remainder = buffer.Length - messageLength;
+                            var remainder = buffer.Length - (headerLength + bodyLength);
                             if (remainder > 0)
-                                Array.Copy(buffer.GetBuffer(), messageLength, buffer.GetBuffer(), 0, remainder);
+                                Array.Copy(buffer.GetBuffer(), headerLength + bodyLength,
+                                    buffer.GetBuffer(), 0, remainder);
 
                             buffer.SetLength(remainder);
                         }
                     }
                 }
-            }
-        }
-
-        async void AcceptSocket()
-        {
-            try
-            {
-                var client = await Input.AcceptTcpClientAsync();
-                AcceptSocket();
-
-                await ProcessClient(client);
-            }
-            catch (InvalidOperationException)
-            {
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
             }
         }
 
